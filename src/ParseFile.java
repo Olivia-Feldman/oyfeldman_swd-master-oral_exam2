@@ -249,7 +249,7 @@ public class ParseFile extends DefaultHandler {
             }
 
         }
-
+    //flag to add drug and interactions into hashmap
         if( !flag && !intFlag){
             System.out.println("new drug");
             drug.setDrugInteractionList(drugList);
