@@ -6,7 +6,7 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.util.*;
 
-import net.miginfocom.swing.MigLayout;
+//import net.miginfocom.swing.MigLayout;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -348,7 +348,7 @@ public class Profile extends BasePanel implements ActionListener {
                 addDrugsFrame.setSize(new Dimension(300, 300));
 
                 JPanel panel = new JPanel();
-                panel.setLayout(new MigLayout());
+               // panel.setLayout(new MigLayout());
 
                 JTextField input = new JTextField(30);
                 panel.add(input);
@@ -394,7 +394,7 @@ public class Profile extends BasePanel implements ActionListener {
             @Override
             public void run() {
                 JFrame drugInfoFrame = new JFrame("More about " + input);
-                drugInfoFrame.setLayout(new MigLayout());
+              //  drugInfoFrame.setLayout(new MigLayout());
                 drugInfoFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 drugInfoFrame.setVisible(true);
                 drugInfoFrame.setSize(new Dimension(300, 300));
@@ -483,7 +483,7 @@ public class Profile extends BasePanel implements ActionListener {
     Profile(JPanel p, String title, String first, String middle, String last, String month, int day, int year, int age, int height, int weight) {
         super(p, title);
 
-        p.setLayout(new MigLayout());
+       // p.setLayout(new MigLayout());
 
         addDrugButton = new JButton("Add");
         addDrugButton.addActionListener(new ActionListener() {
