@@ -114,9 +114,8 @@ public class ParseFile extends DefaultHandler {
 
 
         if(elementName.equalsIgnoreCase("drug")){
-
+            XMLDRUG drug = new XMLDRUG();
             flag = true;
-
 
         }
         else if (elementName.equalsIgnoreCase("drugbank-id")) {
@@ -190,79 +189,74 @@ public class ParseFile extends DefaultHandler {
     public void characters(char ch[], int start, int length) throws SAXException {
 
         if ( flag && !intFlag) {
-            XMLDRUG drug = new XMLDRUG();
+                drug = new XMLDRUG();
             if (drugId) {
 
                 String temp = new String(ch, start, length);
                 drug.setId(temp);
-
-                System.out.println(drug.getId());
+                System.out.println( "Drug ID:"+ drug.getId());
                 drugId = false;
 
             }  else if (drugName) {
                 String temp = new String(ch, start, length);
                 drug.setName(temp);
-                System.out.println(drug.getName());
+                System.out.println("Drug Name"+ drug.getName());
                 drugName = false;
             } else if (drugDescription) {
                 String temp = new String(ch, start, length);
                 drug.setDescription(temp);
-                System.out.println(drug.getDescription());
+                System.out.println(" Drug Description:"+drug.getDescription());
                 drugDescription = false;
 
             }  else if (drugIndication) {
                 String temp = new String(ch, start, length);
                 drug.setIndication(temp);
-                System.out.println(drug.getIndication());
-            }
-            else{
+                System.out.println( "Drug Indication:" + drug.getIndication());
+                drugIndication = false;
+               flag=false;
 
-                flag = false;
             }
+
+
 
         }
-        if (intFlag) {
+
+        else if (intFlag) {
 
             if (drugId) {
                 String temp = new String(ch, start, length);
                 intTemp.setID(temp);
-                System.out.println(temp);
+                System.out.println("Drug ID:" + intTemp.getID());
                 drugId = false;
             }  else if (drugName) {
                 String temp = new String(ch, start, length);
                 intTemp.setName(temp);
-                System.out.println(temp);
+                System.out.println("DrugName:"+ intTemp.getName());
                 drugName = false;
             } else if (drugDescription) {
                 String temp = new String(ch, start, length);
                 intTemp.setInteraction(temp);
-                System.out.println(temp);
+                System.out.println("Interaction:" + intTemp.getInteraction());
                 drugDescription = false;
             }
 
             else {
                 drugList.add(intTemp);
-                intFlag = false;}
+                intFlag = false;
 
 
+
+            }
 
         }
 
-
-        if( !flag){
-            //System.out.println("new drug");
+        if( !flag && !intFlag){
+            System.out.println("new drug");
             drug.setDrugInteractionList(drugList);
             drugDictionary.put(drug.getId(), drug);
-
+            flag = true;
 
         }
-
-        flag = true;
-
-
-
-
-
 
 
 
