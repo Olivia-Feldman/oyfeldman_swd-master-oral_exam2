@@ -1,272 +1,138 @@
 
-
-import java.io.File;
-
-import java.io.IOException;
-
-import java.util.ArrayList;
-
+import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
-import javax.xml.xpath.XPathExpressionException;
-;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
-import org.xml.sax.helpers.DefaultHandler;
-
-import java.util.*;
-
-public class ParseFile extends DefaultHandler {
-    private String fileName,tempValue;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 
-    public HashMap<String, XMLDRUG> getDrugDictionary() {
+public class ParseFile {
+
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder builder = factory.newDocumentBuilder();
+
+    public HashMap<String, XMLDrug> getDrugDictionary() {
         return drugDictionary;
     }
 
-    private HashMap<String, XMLDRUG> drugDictionary; //map drug name to drug object
-
-
-    private boolean count = false;
-
-
-    private ArrayList<XMLDRUG.DrugInt> drugList;
-
-
-    public void setDrugId(boolean drugId) {
-        this.drugId = drugId;
+    public void setDrugDictionary(HashMap<String, XMLDrug> drugDictionary) {
+        this.drugDictionary = drugDictionary;
     }
 
-    private boolean drugId;
-    private boolean drugName;
-    private boolean drugDescription;
-    private boolean drugIndication;
-    private boolean drugCount = true;
-    private XMLDRUG.DrugInt intTemp = new XMLDRUG.DrugInt();
-    private XMLDRUG drug = new XMLDRUG();
-
-    public void setDrugName(boolean drugName) {
-        this.drugName = drugName;
+    public ArrayList<XMLDrug.DrugInt> getDrugList() {
+        return drugList;
     }
 
-
-
-    public void setDrugDescription(boolean drugDescription) {
-        this.drugDescription = drugDescription;
+    public void setDrugList(ArrayList<XMLDrug.DrugInt> drugList) {
+        this.drugList = drugList;
     }
+    //datastructure
+    private HashMap<String, XMLDrug> drugDictionary;
+    private ArrayList<XMLDrug.DrugInt> drugList;
 
 
 
-    public void setDrugIndication(boolean drugIndication) {
-        this.drugIndication = drugIndication;
-    }
-
-
-
-    public void setDrugInteractions(boolean drugInteractions) {
-        this.drugInteractions = drugInteractions;
-    }
-
-    private boolean drugInteractions;
-    private boolean flag, intFlag;
-    private boolean keep = false;
-
-
-
-
-
-    private boolean packagers = true;
-    ParseFile(String fileName) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
-        this.fileName = fileName;
-        drugDictionary = new HashMap<String, XMLDRUG>();
-        drugList = new ArrayList<>();
-        parseXML();
-
-
-    }
-
-    void parseXML() throws IOException, SAXException {
-        SAXParserFactory factory = SAXParserFactory.newDefaultInstance();
-
+    public ParseFile() throws ParserConfigurationException {
         try {
-            File file = new File("/Users/oliviafeldman/Desktop/xmlFileReader/src/SampleDrugDatabase.xml");
+            File inputFile = new File("/Users/oliviafeldman/Desktop/XMLParse/src/SampleDrugDatabase copy.xml");
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(inputFile);
+            doc.getDocumentElement().normalize();
 
-            SAXParser parser = factory.newSAXParser();
-            parser.parse(file, this);
+            System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+            NodeList nList = doc.getElementsByTagName("drug");
+            System.out.println("----------------------------");
+            drugDictionary = new HashMap<>();
+
+
+            for (int temp = 0; temp < nList.getLength(); temp++) {
+                drugList = new ArrayList<>();
+                XMLDrug drug = new XMLDrug();
+
+                Node nNode = nList.item(temp);
+                System.out.println("\nCurrent Element :" + nNode.getNodeName());
+
+
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element eElement = (Element) nNode; //eElement is always a drug
+
+                    System.out.println("drugbank-id"
+                            + eElement.getElementsByTagName("drugbank-id").item(0).getTextContent());
+                    //initializing the drug id value
+                    drug.setId(eElement.getElementsByTagName("drugbank-id").item(0).getTextContent());
+
+
+                    System.out.println("drug name:"
+                            + eElement.getElementsByTagName("name").item(0).getTextContent());
+
+                    //initializing the drug name value
+                    drug.setName(eElement.getElementsByTagName("name").item(0).getTextContent());
+
+
+                    System.out.println("drug description:"
+                            + eElement.getElementsByTagName("description").item(0).getTextContent());
+                    drug.setDescription(eElement.getElementsByTagName("description").item(0).getTextContent());
+
+
+
+                    System.out.println("indication"
+                            + eElement.getElementsByTagName("indication").item(0).getTextContent());
+                    //initialize the drug indication
+                    drug.setIndication(eElement.getElementsByTagName("indication").item(0).getTextContent());
+
+                    NodeList newNode = eElement.getElementsByTagName("drug-interaction");
+                    for(int j = 0; j < newNode.getLength();j++){
+                        Node nNode1 = newNode.item(j);
+                        XMLDrug.DrugInt tempIntDrug = new XMLDrug.DrugInt();
+                        if(nNode1.getNodeType() ==Node.ELEMENT_NODE){
+                            Element eElement1 = (Element) nNode1; //eElement1 is always a drug-interaction
+
+                            tempIntDrug.setID(eElement.getElementsByTagName("drugbank-id").item(0).getTextContent());
+                            System.out.println(eElement1.getElementsByTagName("drugbank-id").item(0).getTextContent());
+                            tempIntDrug.setName(eElement.getElementsByTagName("name").item(0).getTextContent());
+                            System.out.println(eElement1.getElementsByTagName("name").item(0).getTextContent());
+                            System.out.println(eElement1.getElementsByTagName("description").item(0).getTextContent());
+                            tempIntDrug.setInteraction(eElement.getElementsByTagName("description").item(0).getTextContent());
+                            drugList.add(tempIntDrug);
+                        }
+
+
+
+                    }
 
 
 
 
 
-        } catch(SAXException |ParserConfigurationException |
-                IOException e)
 
-        {
+                }
+
+                drug.setDrugInteractionList(drugList);
+                drugDictionary.put(drug.getId(),drug);
+                System.out.println(drugDictionary.size());
+                System.out.println(drugDictionary.containsKey("DB00009"));
+                System.out.println(drugList.size());
+
+
+            }
+
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-
-    @Override
-    public void startElement(String st, String st3, String elementName, Attributes attributes) throws SAXException {
-
-
-        if(elementName.equalsIgnoreCase("drug")){
-            XMLDRUG drug = new XMLDRUG();
-            flag = true;
-
-        }
-        else if (elementName.equalsIgnoreCase("drugbank-id")) {
-
-
-            setDrugId(true);
-
-
-        } else if (elementName.equalsIgnoreCase("name")) {
-
-
-            setDrugName(true);}
-
-        else if (elementName.equalsIgnoreCase("description")) {
-
-
-            setDrugDescription(true);
-
-
-        } else if (elementName.equalsIgnoreCase("indication")) {
-
-            setDrugIndication(true);
-
-        } else if (elementName.equalsIgnoreCase("drug-interactions")) {
-
-            intFlag = true;
-        }else if (elementName.equalsIgnoreCase("drug-interaction")) {
-            intTemp = new XMLDRUG.DrugInt();
-
-            setDrugInteractions(true);
-        }
-
+    void createList(XMLDrug.DrugInt temp){
+        drugList.add(temp);
 
     }
-    @Override
-    public void endElement(String uri, String name, String element) throws SAXException {
-        //  System.out.println(element);
-
-
-//
-//            if(element.equalsIgnoreCase("drugbank-id")){
-//
-//
-//            }
-//            else if(element.equalsIgnoreCase("name")){
-//
-//            }
-//            else if(element.equalsIgnoreCase("description")){
-//
-//            }
-//            else if(element.equalsIgnoreCase("indication")){
-//
-//            } else if(element.equalsIgnoreCase("drug-interactions")){
-//
-//
-//             if(element.equalsIgnoreCase("drug")){
-//                    flag = false;
-//           }
-
-
-
-
-
-
-
-
-
-
-    }
-    @Override
-    public void characters(char ch[], int start, int length) throws SAXException {
-
-        if ( flag && !intFlag) {
-                drug = new XMLDRUG();
-            if (drugId) {
-
-                String temp = new String(ch, start, length);
-                drug.setId(temp);
-                System.out.println( "Drug ID:"+ drug.getId());
-                drugId = false;
-
-            }  else if (drugName) {
-                String temp = new String(ch, start, length);
-                drug.setName(temp);
-                System.out.println("Drug Name"+ drug.getName());
-                drugName = false;
-            } else if (drugDescription) {
-                String temp = new String(ch, start, length);
-                drug.setDescription(temp);
-                System.out.println(" Drug Description:"+drug.getDescription());
-                drugDescription = false;
-
-            }  else if (drugIndication) {
-                String temp = new String(ch, start, length);
-                drug.setIndication(temp);
-                System.out.println( "Drug Indication:" + drug.getIndication());
-                drugIndication = false;
-               flag=false;
-
-            }
-
-
-
-        }
-
-        else if (intFlag) {
-
-            if (drugId) {
-                String temp = new String(ch, start, length);
-                intTemp.setID(temp);
-                System.out.println("Drug ID:" + intTemp.getID());
-                drugId = false;
-            }  else if (drugName) {
-                String temp = new String(ch, start, length);
-                intTemp.setName(temp);
-                System.out.println("DrugName:"+ intTemp.getName());
-                drugName = false;
-            } else if (drugDescription) {
-                String temp = new String(ch, start, length);
-                intTemp.setInteraction(temp);
-                System.out.println("Interaction:" + intTemp.getInteraction());
-                drugDescription = false;
-            }
-
-            else {
-                drugList.add(intTemp);
-                intFlag = false;
-
-
-
-            }
-
-        }
-    //flag to add drug and interactions into hashmap
-        if( !flag && !intFlag){
-            System.out.println("new drug");
-            drug.setDrugInteractionList(drugList);
-            drugDictionary.put(drug.getId(), drug);
-            flag = true;
-
-        }
-
-
-
-    }
-
-    @Override
-    public void endDocument() throws SAXException {
-        super.endDocument();
-
-    }
-
 
 }
